@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use League\Csv\Reader;
 use League\Csv\Writer;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 class CsvController extends Controller
 {
     public function __construct()
@@ -18,11 +20,13 @@ class CsvController extends Controller
     }
     public function sortCsv(Request $request)
     {
-        // Check if the CSV file is uploaded
         if (!$request->hasFile('csv_file')) {
             return back()->withErrors(['csv_file' => 'Please upload a CSV file']);
         }
-    
+        
+        $request->validate([
+            'csv_file' => 'required|mimes:csv,txt|max:2048', // maximum file size is 2MB
+        ]);
         // Get the uploaded CSV file
         $csvFile = $request->file('csv_file');
     
